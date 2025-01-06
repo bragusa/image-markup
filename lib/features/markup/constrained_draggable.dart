@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:namer_app/features/markup/markers_provider.dart';
 
 class ConstrainedDraggable<T extends Object> extends StatefulWidget {
   final Widget child;
@@ -59,9 +60,10 @@ class ConstrainedDraggableState<T extends Object> extends State<ConstrainedDragg
     );
 
     // Constrain the offset within these bounds
-    double left = offset.dx.clamp(bounds.left, bounds.right);
-    double top = offset.dy.clamp(bounds.top, bounds.bottom);
+    double left = offset.dx.clamp(bounds.left, bounds.right + MarkersProvider.width/2);
+    double top = offset.dy.clamp(bounds.top, bounds.bottom + (MarkersProvider.height/2) - MarkersProvider.iconSize/2);
     
+    print('offset.dx: ${offset.dx}, offset.dy: ${offset.dy}');
     print('top: $top, left: $left');
     print('bounds.left: ${bounds.left}, bounds.right: ${bounds.right}');
     print('bounds.top: ${bounds.top}, bounds.bottom: ${bounds.bottom}');

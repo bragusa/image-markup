@@ -296,11 +296,11 @@ class _ImageMarkupState extends State<ImageMarkup> {
                                     });
                                   }
                                 },
-                                onLongPress: () {
-                                  setState(() {
-                                    widget.image.provider.removeMarker(marker);
-                                  });
-                                },
+                                // onLongPress: () {
+                                //   setState(() {
+                                //     widget.image.provider.removeMarker(marker);
+                                //   });
+                                // },
                                 child: ConstrainedDraggable(
                                   maxSimultaneousDrags: zoomed ? 0 : 1,
                                   pointerOffset: MarkersProvider.offset,
@@ -450,7 +450,7 @@ class _ImageMarkupState extends State<ImageMarkup> {
             ),
             newMarker
                 ? SizedBox.shrink()
-                : OutlinedButton.icon(
+                : IconButton(
                     style: ButtonStyle(
                       backgroundColor:
                           WidgetStateProperty.all<Color>(Colors.red),
@@ -464,9 +464,7 @@ class _ImageMarkupState extends State<ImageMarkup> {
                     onPressed: () {
                       marker.delete = true;
                       Navigator.of(context).pop(marker);
-                    },
-                    label: Text('Delete'),
-                    iconAlignment: IconAlignment.end,
+                    }
                   ),
             OutlinedButton(
               style: ButtonStyle(
