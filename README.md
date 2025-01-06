@@ -1,6 +1,6 @@
 # image_markup
 
-A new Flutter project.
+Flutter prototype.
 
 ## Getting Started
 
