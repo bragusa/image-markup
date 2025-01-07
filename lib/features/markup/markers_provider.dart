@@ -14,6 +14,7 @@ class MarkerDescription {
 
 // Model class for storing marker data
 class MarkerData {
+  int? index;
   Offset position;
   MarkerDescription info;
   bool showText;
@@ -37,10 +38,10 @@ class MarkerData {
 class MarkersProvider extends ChangeNotifier {
   final List<MarkerData> _markers = [];
 
-  static double width = 100;
+  static double width = 60;
   static double height = 46;
   static double iconSize = 30;
-  static Point offset = Point((width/2) -1, (iconSize/2) -1);
+  static Point offset = Point(width/2, height/2);
 
   static MarkerData getEmptyMarker(){
     return MarkerData(position: Offset(0,0), info: MarkerDescription(shortDescription: ''));
@@ -50,6 +51,11 @@ class MarkersProvider extends ChangeNotifier {
     if (initialMarkers != null) {
       //addMarker(initialMarkers[0]);
       _markers.addAll(initialMarkers);
+      for (int index = 0; index < initialMarkers.length; index++) {
+        var marker = initialMarkers[index];
+        marker.index = index;
+        _markers.add(marker);
+      }
     }
   }
 
@@ -66,14 +72,21 @@ class MarkersProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateMarkerPosition(MarkerData marker, Offset newPosition, bool notify) {
-    print('Moving marker to: ${newPosition.dx}, ${newPosition.dy}');
+  void updateMarkerPosition(MarkerData marker, Offset newPosition) {
+//    print('Moving marker to: ${newPosition.dx}, ${newPosition.dy}');
     if(_markers.contains(marker)) {
-      print('Moving it');
+//      print('Moving it');
       marker.position = newPosition;
-      if (notify) {
+
+      _markers.sort((a, b) {
+        if (a == marker) return 1; // Move `a` to the end
+        if (b == marker) return -1; // Move `b` to the end
+        return 0; // Keep other markers in their current order
+      });
+      //////_markers[_markers.indexOf(marker)] = marker;
+      
         notifyListeners();
-      }
+      
     }
   }
 

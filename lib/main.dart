@@ -48,12 +48,24 @@ class MyAppState extends ChangeNotifier {
 
 //These marekers work with the window at 500x500
   List<ItemImage> imageList = [
+    ItemImage(image: 'forklift.png', name: 'Forklift', provider: MarkersProvider()),
     ItemImage(image: 'grid.png', name: 'Grid', provider: MarkersProvider(
       [
+        MarkerData(position: Offset( 0.1025411764709072, 0.1025751), info: MarkerDescription(shortDescription: 'north-west')),
+        MarkerData(position: Offset( 0.8986928229238472, 0.10294117647058823), info: MarkerDescription(shortDescription: 'north-east')),
+        MarkerData(position: Offset( 0.5, 0.5), info: MarkerDescription(shortDescription: 'center')),
+        MarkerData(position: Offset( 0.10130717707615272, 0.8986928603228401), info: MarkerDescription(shortDescription: 'south-west')),
+        MarkerData(position: Offset( 0.8986928229238472, 0.8986928603228401), info: MarkerDescription(shortDescription: 'south-east'))
         // MarkerData(position: Offset(0.5, 0.1859),info: 'short\nlong description')
       ])),
     //ItemImage(image: 'grid.png', name: 'Grid', provider: MarkersProvider()),
-    ItemImage(image: 'pump.png', name: 'Pump', provider: MarkersProvider()),
+    ItemImage(image: 'pump.png', name: 'Pump', provider: MarkersProvider(
+      [
+        MarkerData(position: Offset(0.2205, 0.2794), info: MarkerDescription(shortDescription: 'motor')),
+        MarkerData(position: Offset(0.8578, 0.5767), info: MarkerDescription(shortDescription: 'intake')),
+        MarkerData(position: Offset(0.7614, 0.1307), info: MarkerDescription(shortDescription: 'outlet')),
+      ]
+    )),
     ItemImage(image: 'motor.png', name: 'Engine', provider: MarkersProvider(
       [ 
         MarkerData(position: Offset(0.3611,0.3419),info: MarkerDescription(shortDescription: 'intake')),
@@ -63,11 +75,12 @@ class MyAppState extends ChangeNotifier {
       ])),
     ItemImage(image: 'extinguisher.png', name: 'Fire Extinguisher', provider: MarkersProvider(
       [ 
-        MarkerData(position: Offset(0.6, -0.16), info: MarkerDescription(shortDescription: 'handle')),
-        MarkerData(position: Offset(0.52, -0.18), info: MarkerDescription(shortDescription: 'gauge', longDescription: 'Check monthly for proper charge')),
-        MarkerData(position: Offset(0.515,0.780),info: MarkerDescription(shortDescription: 'tank')),
-        MarkerData(position: Offset(0.309,0.32),info: MarkerDescription(shortDescription: 'hose')),
-        MarkerData(position: Offset(0.513,0.376),info: MarkerDescription(shortDescription: 'label', longDescription: 'Safety/Instruction label')),
+        MarkerData(position: Offset(0.62,0.160),info: MarkerDescription(shortDescription: 'handle'), color: Colors.blue),
+        MarkerData(position: Offset(0.525,0.150),info: MarkerDescription(shortDescription: 'gauge'), color: Colors.blue),
+        MarkerData(position: Offset(0.309,0.32),info: MarkerDescription(shortDescription: 'hose'), color: Colors.blue),
+        MarkerData(position: Offset(0.513,0.376),info: MarkerDescription(shortDescription: 'label', longDescription: 'Safety/Instruction label'), color: Colors.blue),
+        MarkerData(position: Offset(0.515,0.780),info: MarkerDescription(shortDescription: 'tank'), color: Colors.blue),
+        MarkerData(position: Offset(0.368,0.9),info: MarkerDescription(shortDescription: 'nozzle'), color: Colors.blue),
       ])),
     ItemImage(image: 'packaging.png', name: 'Packaging', provider: MarkersProvider())
   ];

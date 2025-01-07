@@ -17,6 +17,7 @@ class ConstrainedDraggable<T extends Object> extends StatefulWidget {
   final DragUpdateCallback? onDragUpdate;
   final Point? pointerOffset;
   final int? maxSimultaneousDrags;
+  final double scale;
 
   const ConstrainedDraggable({
     super.key,
@@ -32,7 +33,8 @@ class ConstrainedDraggable<T extends Object> extends StatefulWidget {
     this.onDragCompleted,
     this.onDragUpdate,
     this.pointerOffset, 
-    this.maxSimultaneousDrags
+    this.maxSimultaneousDrags,
+    this.scale = 1.0
   });
 
   @override
@@ -45,29 +47,24 @@ class ConstrainedDraggableState<T extends Object> extends State<ConstrainedDragg
   @override
   void initState() {
     super.initState();
-    position = widget.initialPosition; // Initialize the position from the parent
+    position = widget.initialPosition;
   }
 
   Offset _constrainOffset(Offset offset, RenderBox renderBox) {
     // Get the global bounds of the RenderBox
     final Offset globalPosition = renderBox.localToGlobal(Offset.zero);
-    print('pointerOffset: ${widget.pointerOffset}');
+    
     final Rect bounds = Rect.fromLTWH(
       globalPosition.dx - (widget.pointerOffset?.x ?? 0),
       globalPosition.dy - (widget.pointerOffset?.y ?? 0),
-      renderBox.size.width - (widget.pointerOffset?.x ?? 0),
-      renderBox.size.height - (widget.pointerOffset?.y ?? 0),
+      renderBox.size.width * widget.scale - (widget.pointerOffset?.x ?? 0),
+      renderBox.size.height * widget.scale - (widget.pointerOffset?.y ?? 0),
     );
 
     // Constrain the offset within these bounds
     double left = offset.dx.clamp(bounds.left, bounds.right + MarkersProvider.width/2);
-    double top = offset.dy.clamp(bounds.top, bounds.bottom + (MarkersProvider.height/2) - MarkersProvider.iconSize/2);
+    double top = offset.dy.clamp(bounds.top, bounds.bottom + (MarkersProvider.height/2) - (MarkersProvider.iconSize / 2 ) - 5);
     
-    print('offset.dx: ${offset.dx}, offset.dy: ${offset.dy}');
-    print('top: $top, left: $left');
-    print('bounds.left: ${bounds.left}, bounds.right: ${bounds.right}');
-    print('bounds.top: ${bounds.top}, bounds.bottom: ${bounds.bottom}');
-
     return Offset(left, top);
   }
 
