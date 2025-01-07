@@ -72,29 +72,23 @@ class MarkersProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateMarkerPosition(MarkerData marker, Offset newPosition) {
-//    print('Moving marker to: ${newPosition.dx}, ${newPosition.dy}');
-    if(_markers.contains(marker)) {
-//      print('Moving it');
-      marker.position = newPosition;
-
+  void moveToFrontofZIndex(MarkerData marker) {
       _markers.sort((a, b) {
         if (a == marker) return 1; // Move `a` to the end
         if (b == marker) return -1; // Move `b` to the end
         return 0; // Keep other markers in their current order
       });
-      //////_markers[_markers.indexOf(marker)] = marker;
-      
-        notifyListeners();
-      
-    }
+      notifyListeners();
+  }
+
+  void updateMarkerPosition(MarkerData marker, Offset newPosition) {
+    marker.position = newPosition;
+    //moveToFrontofZIndex(marker);
   }
 
   void updateMarkerInfo(MarkerData marker, MarkerDescription info) {
-    if(_markers.contains(marker)) {
-      marker.info = info;
-      notifyListeners();
-    }
+    marker.info = info;
+    notifyListeners();
   }
 
   void removeMarker(MarkerData marker) {

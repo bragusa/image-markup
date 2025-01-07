@@ -114,46 +114,46 @@ class HomePage extends StatelessWidget {
             title: const Text('Image Markup'),
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           ),
-          body:
-            Column(crossAxisAlignment: CrossAxisAlignment.stretch, 
-            children: [
-              Padding(
-                padding: EdgeInsets.all(10),
-                child: Container(
-                    decoration: BoxDecoration(
-                    color: Colors.white, // Background color
-                    borderRadius: BorderRadius.circular(8), // Rounded corners
-                    border: Border.all(color: Colors.grey, width: 1), // Border
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: DropdownButton<ItemImage>(
-                    hint: Text('Select an image'),
-                    underline: SizedBox.shrink(),
-                    isExpanded: true,
-                    value: appState.selectedImage, // Set the initial value
-                    onChanged: (value) {
-                      appState.setSelectedImage(value);
-                    },
-                    items: appState.imageList.map<DropdownMenuItem<ItemImage>>((item) {
-                      return DropdownMenuItem<ItemImage>(
-                        value: item, // Use 'image' as the value
-                        child: Text(
-                            item.name), // Display 'name' as the dropdown text
-                      );
-                    }).toList()
+          body: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch, 
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Container(
+                      decoration: BoxDecoration(
+                      color: Colors.white, // Background color
+                      borderRadius: BorderRadius.circular(8), // Rounded corners
+                      border: Border.all(color: Colors.grey, width: 1), // Border
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: DropdownButton<ItemImage>(
+                      hint: Text('Select an image'),
+                      underline: SizedBox.shrink(),
+                      isExpanded: true,
+                      value: appState.selectedImage, // Set the initial value
+                      onChanged: (value) {
+                        appState.setSelectedImage(value);
+                      },
+                      items: appState.imageList.map<DropdownMenuItem<ItemImage>>((item) {
+                        return DropdownMenuItem<ItemImage>(
+                          value: item, // Use 'image' as the value
+                          child: Text(
+                              item.name), // Display 'name' as the dropdown text
+                        );
+                      }).toList()
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: Padding(
-                padding: const EdgeInsets.all(0),
-                child: Container(
-                    child: appState.selectedImage == null
-                        ? SizedBox.shrink()
-                        : MarkupPage(appState.selectedImage!)),
-              )),
-            ]
-          ),
+                Expanded(
+                  child: Padding(
+                  padding: const EdgeInsets.all(0),
+                  child: Container(
+                      child: appState.selectedImage == null
+                          ? SizedBox.shrink()
+                          : MarkupPage(appState.selectedImage!)),
+                )),
+              ]
+            ),
         );
       },
     );

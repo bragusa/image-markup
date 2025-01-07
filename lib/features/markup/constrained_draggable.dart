@@ -19,29 +19,29 @@ class ConstrainedDraggable<T extends Object> extends StatefulWidget {
   final int? maxSimultaneousDrags;
   final double scale;
 
-  const ConstrainedDraggable({
-    super.key,
-    required this.child,
-    required this.feedback,
-    this.childWhenDragging,
-    this.renderBox,
-    this.axis,
-    this.initialPosition = Offset.zero,
-    this.onDragStarted,
-    this.onDragEnd,
-    this.onDraggableCanceled,
-    this.onDragCompleted,
-    this.onDragUpdate,
-    this.pointerOffset, 
-    this.maxSimultaneousDrags,
-    this.scale = 1.0
-  });
+  const ConstrainedDraggable(
+      {super.key,
+      required this.child,
+      required this.feedback,
+      this.childWhenDragging,
+      this.renderBox,
+      this.axis,
+      this.initialPosition = Offset.zero,
+      this.onDragStarted,
+      this.onDragEnd,
+      this.onDraggableCanceled,
+      this.onDragCompleted,
+      this.onDragUpdate,
+      this.pointerOffset,
+      this.maxSimultaneousDrags,
+      this.scale = 1.0});
 
   @override
   ConstrainedDraggableState<T> createState() => ConstrainedDraggableState<T>();
 }
 
-class ConstrainedDraggableState<T extends Object> extends State<ConstrainedDraggable<T>> {
+class ConstrainedDraggableState<T extends Object>
+    extends State<ConstrainedDraggable<T>> {
   late Offset position;
 
   @override
@@ -53,7 +53,7 @@ class ConstrainedDraggableState<T extends Object> extends State<ConstrainedDragg
   Offset _constrainOffset(Offset offset, RenderBox renderBox) {
     // Get the global bounds of the RenderBox
     final Offset globalPosition = renderBox.localToGlobal(Offset.zero);
-    
+
     final Rect bounds = Rect.fromLTWH(
       globalPosition.dx - (widget.pointerOffset?.x ?? 0),
       globalPosition.dy - (widget.pointerOffset?.y ?? 0),
@@ -62,9 +62,15 @@ class ConstrainedDraggableState<T extends Object> extends State<ConstrainedDragg
     );
 
     // Constrain the offset within these bounds
-    double left = offset.dx.clamp(bounds.left, bounds.right + MarkersProvider.width/2);
-    double top = offset.dy.clamp(bounds.top, bounds.bottom + (MarkersProvider.height/2) - (MarkersProvider.iconSize / 2 ) - 5);
-    
+    double left =
+        offset.dx.clamp(bounds.left, bounds.right + MarkersProvider.width / 2);
+    double top = offset.dy.clamp(
+        bounds.top,
+        bounds.bottom +
+            (MarkersProvider.height / 2) -
+            (MarkersProvider.iconSize / 2) -
+            5);
+
     return Offset(left, top);
   }
 
@@ -79,11 +85,13 @@ class ConstrainedDraggableState<T extends Object> extends State<ConstrainedDragg
         childWhenDragging: widget.childWhenDragging,
         onDragStarted: widget.onDragStarted,
         onDragEnd: (details) {
-        final RenderBox renderBox = widget.renderBox ?? context.findRenderObject() as RenderBox;
-        final Offset constrainedOffset = _constrainOffset(details.offset, renderBox);
+          final RenderBox renderBox =
+              widget.renderBox ?? context.findRenderObject() as RenderBox;
+          final Offset constrainedOffset =
+              _constrainOffset(details.offset, renderBox);
 
           setState(() {
-            position = constrainedOffset; // Update the position in the state
+            position = constrainedOffset;
           });
 
           if (widget.onDragEnd != null) {
