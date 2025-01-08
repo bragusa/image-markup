@@ -2,16 +2,13 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:namer_app/main.dart';
 import 'package:provider/provider.dart';
 import 'markers_provider.dart';
 import 'constrained_draggable.dart';
-import 'package:universal_io/io.dart';
-import 'custom_marker_painter.dart';
 
-bool isMobile() {
-  return Platform.isAndroid || Platform.isIOS;
-}
+import 'custom_marker_painter.dart';
 
 class AssetImage extends StatefulWidget {
   final String image;
@@ -113,6 +110,7 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
 
   get zoomLevel => _scaleFactor;
   Size? _lastScreenSize;
+  FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -256,6 +254,30 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
       });
     }
 
+    void editMarker(MarkerData marker) async {
+      setState(() {
+        setCurrentMarker(marker);
+      });
+
+      widget.image.provider.moveToFrontofZIndex(marker);
+      print(
+          "marker offset ${marker.position.dx}, ${marker.position.dy}");
+
+      final updatedMarker = await _showInputDialog(
+          marker, widget.image.provider, context);
+
+      if (updatedMarker != null) {
+        if (updatedMarker.delete == true) {
+          _showDeleteConfirmationDialog(marker);
+        } else {
+          setState(() {
+            marker.info = updatedMarker.info;
+          });
+        }
+      }
+    }
+    var appState = context.watch<MyAppState>();
+
     return Consumer<MarkersProvider>(
       builder: (context, provider, child) {
         return InteractiveViewer(
@@ -272,108 +294,126 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
           scaleEnabled: true,
           minScale: 1.0,
           maxScale: 10.0,
-          child: Center(
-            child: GestureDetector(
-              onTapUp: (details) async {
-                MarkerData newMarker = MarkersProvider.getEmptyMarker();
-                newMarker.position = normalize(details.localPosition);
-                // Show the input dialog to add a new marker
-                final markerData = await _showInputDialog(
-                    newMarker, widget.image.provider, context);
-                if (markerData != null) {
-                  setState(() {
-                    widget.image.provider
-                        .addMarker(markerData); // Add marker and update state
-                    setCurrentMarker(markerData);
-                  });
-                } else {}
-              },
-              child: Stack(
-                children: [
-                  AssetImage(key: _imageKey, image: widget.image.image),
-                  // Render markers
-                  if (_imageReady && _delayedRender)
-                    ...widget.image.provider.markers.map((marker) {
-                      final Point point = getPoint(marker.position);
-
-                      final left =
-                          point.x.toDouble() - MarkersProvider.offset.x;
-                      final top = point.y.toDouble() - MarkersProvider.offset.y;
-                      final imageBox = _imageKey.currentContext!
-                          .findRenderObject() as RenderBox;
-
-                      return Positioned(
-                        left: left,
-                        top: top,
-                        child: GestureDetector(
-                          onTapUp: (details) async {
-                            setState(() {
-                              setCurrentMarker(marker);
-                            });
-
-                            widget.image.provider.moveToFrontofZIndex(marker);
-                            print(
-                                "marker offset ${marker.position.dx}, ${marker.position.dy}");
-
-                            final updatedMarker = await _showInputDialog(
-                                marker, widget.image.provider, context);
-
-                            if (updatedMarker != null) {
-                              if (updatedMarker.delete == true) {
-                                setState(() {
-                                  widget.image.provider.removeMarker(marker);
-                                  setCurrentMarker(marker);
-                                });
-                              } else {
-                                setState(() {
-                                  marker.info = updatedMarker.info;
-                                });
+          child: KeyboardListener(
+            onKeyEvent: (value) {
+              if(_currentMarker != null){
+                switch(value.logicalKey){
+                  case LogicalKeyboardKey.delete:
+                   _showDeleteConfirmationDialog(_currentMarker!); // Show the dialog before deleting
+                    setState(() {
+                      widget.image.provider.removeMarker(_currentMarker!);
+                    });
+                  case  LogicalKeyboardKey.escape:
+                    setState(() {
+                      _currentMarker = null;
+                    });
+                }
+              }
+              // if(value.logicalKey == LogicalKeyboardKey.delete){
+              //   setState(() {
+              //     widget.image.provider.removeMarker(_currentMarker!);
+              //   });
+              // }
+            },
+            focusNode: _focusNode,
+            child: Center(
+              child: GestureDetector(
+                onTapUp: (details) async {
+                  MarkerData newMarker = MarkersProvider.getEmptyMarker();
+                  newMarker.position = normalize(details.localPosition);
+                  // Show the input dialog to add a new marker
+                  final markerData = await _showInputDialog(
+                      newMarker, widget.image.provider, context);
+                  if (markerData != null) {
+                    setState(() {
+                      widget.image.provider
+                          .addMarker(markerData); // Add marker and update state
+                      setCurrentMarker(markerData);
+                    });
+                  } else {}
+                },
+                child: Stack(
+                  children: [
+                    AssetImage(key: _imageKey, image: widget.image.image),
+                    // Render markers
+                    if (_imageReady && _delayedRender)
+                      ...widget.image.provider.markers.map((marker) {
+                        final Point point = getPoint(marker.position);
+            
+                        final left =
+                            point.x.toDouble() - MarkersProvider.offset.x;
+                        final top = point.y.toDouble() - MarkersProvider.offset.y;
+                        final imageBox = _imageKey.currentContext!
+                            .findRenderObject() as RenderBox;
+            
+                        return Positioned(
+                          left: left,
+                          top: top,
+                          child: GestureDetector(
+                            onTap: () {
+                              _focusNode.requestFocus();
+                              setState(() {
+                                setCurrentMarker(marker);
+                              });
+                              print("marker offset ${marker.position.dx}, ${marker.position.dy}");
+                            },
+                            onLongPress: () async {
+                              if(!appState.ismobile){
+                                return;
                               }
-                            }
-                          },
-                          child: ConstrainedDraggable(
-                              pointerOffset: MarkersProvider.offset,
-                              renderBox: imageBox,
-                              scale: _scaleFactor,
-                              feedback: Transform.scale(
+                              editMarker(marker);
+                            },
+                            onSecondaryTap: () async {
+                              if(appState.ismobile){
+                                return;
+                              }
+                              editMarker(marker);
+                            },
+                            child: ConstrainedDraggable(
+                                pointerOffset: MarkersProvider.offset,
+                                renderBox: imageBox,
                                 scale: _scaleFactor,
+                                feedback: Transform.scale(
+                                  scale: _scaleFactor,
+                                  child: _buildMarker(marker, Point(left, top),
+                                      imageBox, true, true),
+                                ),
                                 child: _buildMarker(marker, Point(left, top),
-                                    imageBox, true, true),
-                              ),
-                              child: _buildMarker(marker, Point(left, top),
-                                  imageBox, _currentMarker == marker, false),
-                              onDragStarted: () {
-                                setState(() {
-                                  if (!marker.hide) {
-                                    widget.image.provider
-                                        .hideMarker(marker, true);
-                                  }
-                                  setCurrentMarker(marker);
-                                });
-                              },
-                              onDragEnd: (details) {
-                                final RenderBox renderBox =
-                                    _imageKey.currentContext!.findRenderObject()
-                                        as RenderBox;
-                                final containerPosition =
-                                    renderBox.localToGlobal(Offset.zero);
-
-                                final adjusted = Offset(
-                                    (details.offset.dx -
-                                            containerPosition.dx +
-                                            MarkersProvider.offset.x) /
-                                        _scaleFactor,
-                                    (details.offset.dy -
-                                            containerPosition.dy +
-                                            MarkersProvider.offset.y) /
-                                        _scaleFactor);
-
-                                moveMarker(marker, adjusted);
-                              }),
-                        ),
-                      );
-                    }),
-                ],
+                                    imageBox, _currentMarker == marker, false),
+                                onDragStarted: () {
+                                  _focusNode.requestFocus();
+                                  setState(() {
+                                    if (!marker.hide) {
+                                      widget.image.provider
+                                          .hideMarker(marker, true);
+                                    }
+                                    setCurrentMarker(marker);
+                                  });
+                                },
+                                onDragEnd: (details) {
+                                  final RenderBox renderBox =
+                                      _imageKey.currentContext!.findRenderObject()
+                                          as RenderBox;
+                                  final containerPosition =
+                                      renderBox.localToGlobal(Offset.zero);
+            
+                                  final adjusted = Offset(
+                                      (details.offset.dx -
+                                              containerPosition.dx +
+                                              MarkersProvider.offset.x) /
+                                          _scaleFactor,
+                                      (details.offset.dy -
+                                              containerPosition.dy +
+                                              MarkersProvider.offset.y) /
+                                          _scaleFactor);
+            
+                                  moveMarker(marker, adjusted);
+                                }),
+                          ),
+                        );
+                      }),
+                  ],
+                ),
               ),
             ),
           ),
@@ -452,6 +492,41 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
     );
   }
 
+  Future<void> _showDeleteConfirmationDialog(MarkerData marker) async {
+    if (_currentMarker != null) {
+      final shouldDelete = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Delete Marker'),
+            content: Text('Are you sure you want to delete this marker?'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false); // Cancel
+                },
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true); // Confirm
+                },
+                child: Text('Delete'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (shouldDelete == true) {
+        setState(() {
+          _currentMarker = null;
+          widget.image.provider.removeMarker(marker);
+        });
+      }
+    }
+  }
+
   Future<MarkerData?> _showInputDialog(
       MarkerData marker, MarkersProvider provider, BuildContext context) async {
     TextEditingController shortController =
@@ -462,9 +537,8 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     final newMarker = marker.info.shortDescription == '';
-
-    final ismobile = isMobile();
-
+    var appState = Provider.of<MyAppState>(context, listen: false);
+    print(" ismobile ${appState.ismobile}");
     return showDialog<MarkerData>(
       // ignore: use_build_context_synchronously as I checked for mounted above
       context: context,
@@ -477,7 +551,7 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
-                  autofocus: ismobile ? false : true,
+                  autofocus: appState.ismobile ? false : true,
                   decoration: InputDecoration(
                     labelText: "Title *", // Add an asterisk
                     border: OutlineInputBorder(),

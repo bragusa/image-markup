@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'features/markup/image_markup.dart';
 import 'features/markup/markers_provider.dart'; // Import your MarkersProvider class
+import 'package:universal_html/html.dart' as html;
+import 'package:universal_io/io.dart';
+
+
 
 class ItemImage {
   final String image;
@@ -20,9 +24,15 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
+  
   @override
   Widget build(BuildContext context) {
+    
+  final ismobile = Platform.isAndroid || Platform.isIOS;
+  
+  if(ismobile) {
+    html.document.onContextMenu.listen((event) => event.preventDefault());
+  }
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => MyAppState()),
@@ -45,6 +55,7 @@ class MyAppState extends ChangeNotifier {
   
   ItemImage? selectedImage;
   bool debug = false;
+  final ismobile = Platform.isAndroid || Platform.isIOS;
 
 //These marekers work with the window at 500x500
   List<ItemImage> imageList = [
@@ -107,55 +118,59 @@ class HomePage extends StatelessWidget {
         appState.setSelectedImage(appState.imageList[0]);
       });
     }
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Image Markup'),
-            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          ),
-          body: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch, 
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Container(
-                      decoration: BoxDecoration(
-                      color: Colors.white, // Background color
-                      borderRadius: BorderRadius.circular(8), // Rounded corners
-                      border: Border.all(color: Colors.grey, width: 1), // Border
+    return Builder(
+      builder: (context) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text('Image Markup'),
+                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+              ),
+              body: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch, 
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Container(
+                          decoration: BoxDecoration(
+                          color: Colors.white, // Background color
+                          borderRadius: BorderRadius.circular(8), // Rounded corners
+                          border: Border.all(color: Colors.grey, width: 1), // Border
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: DropdownButton<ItemImage>(
+                          hint: Text('Select an image'),
+                          underline: SizedBox.shrink(),
+                          isExpanded: true,
+                          value: appState.selectedImage, // Set the initial value
+                          onChanged: (value) {
+                            appState.setSelectedImage(value);
+                          },
+                          items: appState.imageList.map<DropdownMenuItem<ItemImage>>((item) {
+                            return DropdownMenuItem<ItemImage>(
+                              value: item, // Use 'image' as the value
+                              child: Text(
+                                  item.name), // Display 'name' as the dropdown text
+                            );
+                          }).toList()
+                        ),
+                      ),
                     ),
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: DropdownButton<ItemImage>(
-                      hint: Text('Select an image'),
-                      underline: SizedBox.shrink(),
-                      isExpanded: true,
-                      value: appState.selectedImage, // Set the initial value
-                      onChanged: (value) {
-                        appState.setSelectedImage(value);
-                      },
-                      items: appState.imageList.map<DropdownMenuItem<ItemImage>>((item) {
-                        return DropdownMenuItem<ItemImage>(
-                          value: item, // Use 'image' as the value
-                          child: Text(
-                              item.name), // Display 'name' as the dropdown text
-                        );
-                      }).toList()
-                    ),
-                  ),
+                    Expanded(
+                      child: Padding(
+                      padding: const EdgeInsets.all(0),
+                      child: Container(
+                          child: appState.selectedImage == null
+                              ? SizedBox.shrink()
+                              : MarkupPage(appState.selectedImage!)),
+                    )),
+                  ]
                 ),
-                Expanded(
-                  child: Padding(
-                  padding: const EdgeInsets.all(0),
-                  child: Container(
-                      child: appState.selectedImage == null
-                          ? SizedBox.shrink()
-                          : MarkupPage(appState.selectedImage!)),
-                )),
-              ]
-            ),
+            );
+          },
         );
-      },
+      }
     );
   }
 }

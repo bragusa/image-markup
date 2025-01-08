@@ -40,6 +40,7 @@ dependencies:
   table_calendar: ^3.1.3
   calendar_view: ^1.3.0
   vector_math: ^2.1.4
+  universal_html: ^2.2.4
 
 dev_dependencies:
   flutter_test:
