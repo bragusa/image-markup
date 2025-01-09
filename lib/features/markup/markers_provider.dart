@@ -14,6 +14,7 @@ class MarkerDescription {
 
 // Model class for storing marker data
 class MarkerData {
+  String id;
   int? index;
   Offset position;
   MarkerDescription info;
@@ -23,7 +24,7 @@ class MarkerData {
   bool? delete;
   MarkersProvider? provider;
   
-  MarkerData({required this.position, required this.info, this.showText = true, this.hide = false, this.color = Colors.red});
+  MarkerData({required this.id, required this.position, required this.info, this.showText = true, this.hide = false, this.color = Colors.red});
 
   // Getter for position
   Offset get getPosition => position;
@@ -40,22 +41,16 @@ class MarkersProvider extends ChangeNotifier {
 
   static double width = 60;
   static double height = 46;
-  static double iconSize = 30;
+  static double iconSize = 20;
   static Point offset = Point(width/2, height/2);
 
   static MarkerData getEmptyMarker(){
-    return MarkerData(position: Offset(0,0), info: MarkerDescription(shortDescription: ''));
+    return MarkerData(id: DateTime.now().millisecondsSinceEpoch.toString(), position: Offset(0, 0), info: MarkerDescription(shortDescription: ''));
   }
 
   MarkersProvider([List<MarkerData>? initialMarkers]) {
     if (initialMarkers != null) {
-      //addMarker(initialMarkers[0]);
       _markers.addAll(initialMarkers);
-      for (int index = 0; index < initialMarkers.length; index++) {
-        var marker = initialMarkers[index];
-        marker.index = index;
-        _markers.add(marker);
-      }
     }
   }
 

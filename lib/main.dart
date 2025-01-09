@@ -27,12 +27,9 @@ class MyApp extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    
-  final ismobile = Platform.isAndroid || Platform.isIOS;
-  
-  if(ismobile) {
+      
     html.document.onContextMenu.listen((event) => event.preventDefault());
-  }
+  
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => MyAppState()),
@@ -62,36 +59,35 @@ class MyAppState extends ChangeNotifier {
     ItemImage(image: 'forklift.png', name: 'Forklift', provider: MarkersProvider()),
     ItemImage(image: 'grid.png', name: 'Grid', provider: MarkersProvider(
       [
-        MarkerData(position: Offset( 0.1025411764709072, 0.1025751), info: MarkerDescription(shortDescription: 'north-west')),
-        MarkerData(position: Offset( 0.8986928229238472, 0.10294117647058823), info: MarkerDescription(shortDescription: 'north-east')),
-        MarkerData(position: Offset( 0.5, 0.5), info: MarkerDescription(shortDescription: 'center')),
-        MarkerData(position: Offset( 0.10130717707615272, 0.8986928603228401), info: MarkerDescription(shortDescription: 'south-west')),
-        MarkerData(position: Offset( 0.8986928229238472, 0.8986928603228401), info: MarkerDescription(shortDescription: 'south-east'))
-        // MarkerData(position: Offset(0.5, 0.1859),info: 'short\nlong description')
+        MarkerData(id: 'grid0', position: Offset( 0.1025411764709072, 0.1025751), info: MarkerDescription(shortDescription: 'north-west')),
+        MarkerData(id: 'grid1', position: Offset( 0.8986928229238472, 0.10294117647058823), info: MarkerDescription(shortDescription: 'north-east')),
+        MarkerData(id: 'grid2', position: Offset( 0.5, 0.5), info: MarkerDescription(shortDescription: 'center')),
+        MarkerData(id: 'grid3', position: Offset( 0.10130717707615272, 0.8986928603228401), info: MarkerDescription(shortDescription: 'south-west')),
+        MarkerData(id: 'grid4', position: Offset( 0.8986928229238472, 0.8986928603228401), info: MarkerDescription(shortDescription: 'south-east'))
       ])),
     //ItemImage(image: 'grid.png', name: 'Grid', provider: MarkersProvider()),
     ItemImage(image: 'pump.png', name: 'Pump', provider: MarkersProvider(
       [
-        MarkerData(position: Offset(0.2205, 0.2794), info: MarkerDescription(shortDescription: 'motor')),
-        MarkerData(position: Offset(0.8578, 0.5767), info: MarkerDescription(shortDescription: 'intake')),
-        MarkerData(position: Offset(0.7614, 0.1307), info: MarkerDescription(shortDescription: 'outlet')),
+        MarkerData(id: 'pump0', position: Offset(0.2205, 0.2794), info: MarkerDescription(shortDescription: 'motor')),
+        MarkerData(id: 'pump1', position: Offset(0.8578, 0.5767), info: MarkerDescription(shortDescription: 'intake')),
+        MarkerData(id: 'pump2', position: Offset(0.7614, 0.1307), info: MarkerDescription(shortDescription: 'outlet')),
       ]
     )),
     ItemImage(image: 'motor.png', name: 'Engine', provider: MarkersProvider(
       [ 
-        MarkerData(position: Offset(0.3611,0.3419),info: MarkerDescription(shortDescription: 'intake')),
-        MarkerData(position: Offset(0.0748,0.1948),info: MarkerDescription(shortDescription: 'alternator')),
-        MarkerData(position: Offset(0.5412,0.729),info: MarkerDescription(shortDescription: 'serpentine')),
-        MarkerData(position: Offset(0.1919,0.726),info: MarkerDescription(shortDescription: 'tensioner', longDescription: 'Failure marked by oil discharge')),
+        MarkerData(id: 'engine0', position: Offset(0.3611,0.3419),info: MarkerDescription(shortDescription: 'intake')),
+        MarkerData(id: 'engine1', position: Offset(0.0748,0.1948),info: MarkerDescription(shortDescription: 'alternator')),
+        MarkerData(id: 'engine2', position: Offset(0.5412,0.729),info: MarkerDescription(shortDescription: 'serpentine')),
+        MarkerData(id: 'engine3', position: Offset(0.1919,0.726),info: MarkerDescription(shortDescription: 'tensioner', longDescription: 'Failure marked by oil discharge')),
       ])),
     ItemImage(image: 'extinguisher.png', name: 'Fire Extinguisher', provider: MarkersProvider(
       [ 
-        MarkerData(position: Offset(0.62,0.160),info: MarkerDescription(shortDescription: 'handle'), color: Colors.blue),
-        MarkerData(position: Offset(0.525,0.150),info: MarkerDescription(shortDescription: 'gauge'), color: Colors.blue),
-        MarkerData(position: Offset(0.309,0.32),info: MarkerDescription(shortDescription: 'hose'), color: Colors.blue),
-        MarkerData(position: Offset(0.513,0.376),info: MarkerDescription(shortDescription: 'label', longDescription: 'Safety/Instruction label'), color: Colors.blue),
-        MarkerData(position: Offset(0.515,0.780),info: MarkerDescription(shortDescription: 'tank'), color: Colors.blue),
-        MarkerData(position: Offset(0.368,0.9),info: MarkerDescription(shortDescription: 'nozzle'), color: Colors.blue),
+        MarkerData(id: 'ext0', position: Offset(0.62,0.160),info: MarkerDescription(shortDescription: 'handle'), color: Colors.blue),
+        MarkerData(id: 'ext1', position: Offset(0.525,0.150),info: MarkerDescription(shortDescription: 'gauge'), color: Colors.blue),
+        MarkerData(id: 'ext2', position: Offset(0.309,0.32),info: MarkerDescription(shortDescription: 'hose'), color: Colors.blue),
+        MarkerData(id: 'ext3', position: Offset(0.513,0.376),info: MarkerDescription(shortDescription: 'label', longDescription: 'Safety/Instruction label'), color: Colors.blue),
+        MarkerData(id: 'ext4', position: Offset(0.515,0.780),info: MarkerDescription(shortDescription: 'tank'), color: Colors.blue),
+        MarkerData(id: 'ext5', position: Offset(0.368,0.9),info: MarkerDescription(shortDescription: 'nozzle'), color: Colors.blue),
       ])),
     ItemImage(image: 'packaging.png', name: 'Packaging', provider: MarkersProvider())
   ];

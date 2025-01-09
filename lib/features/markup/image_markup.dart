@@ -260,9 +260,7 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
       });
 
       widget.image.provider.moveToFrontofZIndex(marker);
-      print(
-          "marker offset ${marker.position.dx}, ${marker.position.dy}");
-
+      
       final updatedMarker = await _showInputDialog(
           marker, widget.image.provider, context);
 
@@ -339,7 +337,6 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
                     if (_imageReady && _delayedRender)
                       ...widget.image.provider.markers.map((marker) {
                         final Point point = getPoint(marker.position);
-            
                         final left =
                             point.x.toDouble() - MarkersProvider.offset.x;
                         final top = point.y.toDouble() - MarkersProvider.offset.y;
@@ -347,6 +344,7 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
                             .findRenderObject() as RenderBox;
             
                         return Positioned(
+                          key: ValueKey(marker.id),
                           left: left,
                           top: top,
                           child: GestureDetector(
@@ -355,7 +353,7 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
                               setState(() {
                                 setCurrentMarker(marker);
                               });
-                              print("marker offset ${marker.position.dx}, ${marker.position.dy}");
+                              print("marker ${marker.id} offset ${marker.position.dx}, ${marker.position.dy}");
                             },
                             onLongPress: () async {
                               if(!appState.ismobile){
@@ -382,13 +380,16 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
                                     imageBox, _currentMarker == marker, false),
                                 onDragStarted: () {
                                   _focusNode.requestFocus();
+                                  
                                   setState(() {
                                     if (!marker.hide) {
                                       widget.image.provider
                                           .hideMarker(marker, true);
                                     }
                                     setCurrentMarker(marker);
+                                    
                                   });
+                                  widget.image.provider.moveToFrontofZIndex(marker);
                                 },
                                 onDragEnd: (details) {
                                   final RenderBox renderBox =
@@ -452,7 +453,7 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
                 Positioned(
                   bottom: position.y >
                           renderBox.size.height - MarkersProvider.height
-                      ? MarkersProvider.height - 10
+                      ? MarkersProvider.height -  12
                       : 0,
                   left:
                       position.x > renderBox.size.width - MarkersProvider.width
@@ -538,7 +539,7 @@ class _ImageMarkupState extends State<ImageMarkup> with WidgetsBindingObserver {
 
     final newMarker = marker.info.shortDescription == '';
     var appState = Provider.of<MyAppState>(context, listen: false);
-    print(" ismobile ${appState.ismobile}");
+
     return showDialog<MarkerData>(
       // ignore: use_build_context_synchronously as I checked for mounted above
       context: context,

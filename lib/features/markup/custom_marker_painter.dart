@@ -14,8 +14,8 @@ class CustomMarkerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final outerRadius = size.width / 5;
-    final innerRadius = outerRadius / 4;
+    final outerRadius = size.width / 2;
+    final innerRadius = 2.toDouble();
 
     final paint = Paint()
       ..style = PaintingStyle.fill;
